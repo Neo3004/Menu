@@ -12,7 +12,6 @@ import {
   Platform,
   UIManager,
   KeyboardAvoidingView,
-  ScrollView,
   Alert,
 } from "react-native";
 
@@ -31,8 +30,8 @@ type MenuItem = {
 
 const COURSES = ["Starters", "Mains", "Dessert"];
 
-export default function App(){
-  const [menuItems, setMenuItems] = useState>([]);
+export default function App() {
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [priceText, setPriceText] = useState("");
@@ -45,64 +44,9 @@ export default function App(){
     setPriceText("");
     setCourse(COURSES[0]);
     setShowCourseDropdown(false);
-  };//closes only resetForm
-  
-
-return(
-  <div>
-      <h1>Menu Form</h1>
-      <input
-        type="text"
-        placeholder="Dish Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Price"
-        value={priceText}
-        onChange={(e) => setPriceText(e.target.value)}
-      />
-      <select value={course} onChange={(e) => setCourse(e.target.value)}>
-        {COURSES.map((c) => (
-          <option key={c} value={c}>
-            {c}
-          </option>
-        ))}
-      </select>
-<button
-        onClick={() => {
-          if (name && description && priceText) {
-            const newItem = { name, description, price: priceText, course };
-            setMenuItems([...menuItems, newItem]);
-            resetForm();
-          }
-        }}
-      >
-        Add Item
-      </button>
-      <button onClick={resetForm}>Reset</button>
-
-      <h2>Menu Items</h2>
-      <ul>
-        {menuItems.map((item, index) => (
-          <li key={index}>
-            <b>{item.name}</b> ({item.course}) - {item.description} : {item.price}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+  };
 
   const addMenuItem = () => {
-    // Basic validation
     if (!name.trim()) {
       Alert.alert("Validation", "Please enter the dish name.");
       return;
@@ -117,7 +61,6 @@ return(
       return;
     }
 
-    // Animate list change
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 
     const newItem: MenuItem = {
@@ -150,22 +93,87 @@ return(
       </View>
     );
   };
-  //return MUST be inside App function, not after a stray '}'
+
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-       
-         class KeyboardAvoidingView>
-           KeyboardAvoidingView:true
-         
-class SafeAreaView>
-   SafeAreaView>
-      );
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+        <View style={styles.container}>
+          <Text style={styles.header}>Add Menu Item</Text>
 
+          <View style={styles.form}>
+            <TextInput
+              style={styles.input}
+              placeholder="Dish Name"
+              value={name}
+              onChangeText={setName}
+            />
+            <TextInput
+              style={[styles.input, styles.multiline]}
+              placeholder="Description"
+              multiline
+              value={description}
+              onChangeText={setDescription}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Price"
+              keyboardType="numeric"
+              value={priceText}
+              onChangeText={setPriceText}
+            />
+
+            <TouchableOpacity
+              style={styles.courseSelector}
+              onPress={() => setShowCourseDropdown(!showCourseDropdown)}
+            >
+              <Text style={styles.courseSelectorText}>{course}</Text>
+              <Text style={styles.courseSelectorArrow}>▼</Text>
+            </TouchableOpacity>
+  {showCourseDropdown && (
+              <View style={styles.courseDropdown}>
+                {COURSES.map((c) => (
+                  <TouchableOpacity
+                    key={c}
+                    style={styles.courseOption}
+                    onPress={() => {
+                      setCourse(c);
+                      setShowCourseDropdown(false);
+                    }}
+                  >
+                    <Text style={styles.courseOptionText}>{c}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            <TouchableOpacity style={styles.addButton} onPress={addMenuItem}>
+              <Text style={styles.addButtonText}>Add Item</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.divider} />
+
+          <Text style={styles.sectionTitle}>Menu Items</Text>
+          {menuItems.length === 0 ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyText}>No items yet.</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={menuItems}
+              renderItem={renderMenuItem}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.list}
+            />
+          )}
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
 
 const styles = StyleSheet.create({
-  Safe: {
+  safe: {
     flex: 1,
     backgroundColor: "#f7f7fb",
   },
@@ -189,18 +197,13 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
-  label: {
-    fontSize: 13,
-    marginTop: 8,
-    marginBottom: 6,
-    color: "#333",
-  },
   input: {
     borderWidth: 1,
     borderColor: "#e2e2ea",
     padding: 10,
     borderRadius: 8,
     backgroundColor: "#fff",
+    marginBottom: 8,
   },
   multiline: {
     minHeight: 70,
@@ -258,11 +261,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
-  totalCount: {
-    fontSize: 16,
-    color: "#666",
-    alignSelf: "center",
-  },
   list: {
     paddingBottom: 8,
   },
@@ -287,33 +285,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#666",
   },
-  cardDesc: {
-    color: "#444",
-    marginBottom: 8,
-  },
-  cardFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  cardPrice: {
-    fontWeight: "700",
-    color: "#111",
-  },
-  cardDate: {
-    color: "#888",
-    fontSize: 12,
-  },
-  empty: {
-    padding: 20,
-    alignItems: "center",
-  },
-  emptyText: {
-    color: "#666",
-  },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-});
+ 
+
