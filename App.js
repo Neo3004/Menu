@@ -265,7 +265,6 @@ const styles = StyleSheet.create({
   justifyContent: "space-between",
   alignItems: "center",
   marginBottom: 8,
-},
 totalCount: {
   fontSize: 16,
   color: "#555",
@@ -296,5 +295,6 @@ totalCount: {
     fontSize: 13,
     color: "#666",
   },
+});
  
 
