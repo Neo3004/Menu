@@ -153,8 +153,11 @@ export default function App() {
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionTitle}>Menu Items</Text>
-          {menuItems.length === 0 ? (
+          <View style={styles.sectionHeader}>
+  <Text style={styles.sectionTitle}>Menu Items</Text>
+  <Text style={styles.totalCount}>Total: {menuItems.length}</Text>
+</View>
+
             <View style={styles.empty}>
               <Text style={styles.emptyText}>No items yet.</Text>
             </View>
@@ -257,10 +260,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#ececf2",
     marginVertical: 16,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
+  sectionHeader: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: 8,
+},
+totalCount: {
+  fontSize: 16,
+  color: "#555",
+  fontWeight: "600",
+},
+
   list: {
     paddingBottom: 8,
   },
