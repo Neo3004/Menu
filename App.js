@@ -1,177 +1,155 @@
 // App.tsx
 import React, { useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 import {
   SafeAreaView,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  LayoutAnimation,
-  Platform,
-  UIManager,
-  KeyboardAvoidingView,
+  TextInput,
   Alert,
 } from "react-native";
 
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
+const Stack = createStackNavigator();
+
+// 🏠 Home Screen – Displays the prepared menu
+function HomeScreen({ navigation, route }) {
+  const [menuItems, setMenuItems] = useState([]);
+
+  // If a new item is passed back from Add screen, add it
+  React.useEffect(() => {
+    if (route.params?.newItem) {
+      setMenuItems((prev) => [...prev, route.params.newItem]);
+    }
+  }, [route.params?.newItem]);
+
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <Text style={styles.cardTitle}>{item.name}</Text>
+      <Text style={styles.cardCourse}>{item.course}</Text>
+      <Text style={styles.cardDesc}>{item.description}</Text>
+      <Text style={styles.cardPrice}>R {item.price}</Text>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.container}>
+        <Text style={styles.header}>🍽️ Chef’s Menu</Text>
+        <Text style={styles.totalCount}>
+          Total Menu Items: {menuItems.length}
+        </Text>
+
+        {menuItems.length === 0 ? (
+          <Text style={styles.emptyText}>No menu items added yet.</Text>
+        ) : (
+          <FlatList
+            data={menuItems}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={{ paddingVertical: 10 }}
+          />
+        )}
+
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() =>
+            navigation.navigate("AddMenuItem", { existing: menuItems })
+          }
+        >
+          <Text style={styles.addButtonText}>➕ Add Menu Item</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
 }
 
-type MenuItem = {
-  id: string;
-  name: string;
-  description: string;
-  course: string;
-  price: number;
-  createdAt: number;
-};
-
-const COURSES = ["Starters", "Mains", "Dessert"];
-
-export default function App() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+// ➕ Add Menu Item Screen
+function AddMenuItemScreen({ navigation }) {
   const [name, setName] = useState("");
+  const [course, setCourse] = useState("");
   const [description, setDescription] = useState("");
-  const [priceText, setPriceText] = useState("");
-  const [course, setCourse] = useState(COURSES[0]);
-  const [showCourseDropdown, setShowCourseDropdown] = useState(false);
+  const [price, setPrice] = useState("");
 
-  const resetForm = () => {
-    setName("");
-    setDescription("");
-    setPriceText("");
-    setCourse(COURSES[0]);
-    setShowCourseDropdown(false);
-  };
-
-  const addMenuItem = () => {
-    if (!name.trim()) {
-      Alert.alert("Validation", "Please enter the dish name.");
-      return;
-    }
-    if (!description.trim()) {
-      Alert.alert("Validation", "Please enter a description.");
-      return;
-    }
-    const parsedPrice = parseFloat(priceText);
-    if (isNaN(parsedPrice) || parsedPrice < 0) {
-      Alert.alert("Validation", "Please enter a valid non-negative price.");
+  const handleAdd = () => {
+    if (!name || !course || !description || !price) {
+      Alert.alert("Error", "Please fill in all fields.");
       return;
     }
 
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-    const newItem: MenuItem = {
-      id: String(Date.now()),
-      name: name.trim(),
-      description: description.trim(),
+    const newItem = {
+      id: Date.now().toString(),
+      name,
       course,
-      price: parsedPrice,
-      createdAt: Date.now(),
+      description,
+      price: parseFloat(price).toFixed(2),
     };
 
-    setMenuItems((prev) => [newItem, ...prev]);
-    resetForm();
-  };
-
-  const renderMenuItem = ({ item }: { item: MenuItem }) => {
-    return (
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>{item.name}</Text>
-          <Text style={styles.cardCourse}>{item.course}</Text>
-        </View>
-        <Text style={styles.cardDesc}>{item.description}</Text>
-        <View style={styles.cardFooter}>
-          <Text style={styles.cardPrice}>R {item.price.toFixed(2)}</Text>
-          <Text style={styles.cardDate}>
-            {new Date(item.createdAt).toLocaleTimeString()}
-          </Text>
-        </View>
-      </View>
-    );
+    navigation.navigate("Home", { newItem });
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
-        <View style={styles.container}>
-          <Text style={styles.header}>Add Menu Item</Text>
+      <View style={styles.container}>
+        <Text style={styles.header}>Add New Menu Item</Text>
 
-          <View style={styles.form}>
-            <TextInput
-              style={styles.input}
-              placeholder="Dish Name"
-              value={name}
-              onChangeText={setName}
-            />
-            <TextInput
-              style={[styles.input, styles.multiline]}
-              placeholder="Description"
-              multiline
-              value={description}
-              onChangeText={setDescription}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Price"
-              keyboardType="numeric"
-              value={priceText}
-              onChangeText={setPriceText}
-            />
+        <TextInput
+          style={styles.input}
+          placeholder="Dish Name"
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Course (Starter, Main, Dessert)"
+          value={course}
+          onChangeText={setCourse}
+        />
+        <TextInput
+          style={[styles.input, styles.multiline]}
+          placeholder="Description"
+          multiline
+          value={description}
+          onChangeText={setDescription}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Price"
+          keyboardType="numeric"
+          value={price}
+          onChangeText={setPrice}
+        />
 
-            <TouchableOpacity
-              style={styles.courseSelector}
-              onPress={() => setShowCourseDropdown(!showCourseDropdown)}
-            >
-              <Text style={styles.courseSelectorText}>{course}</Text>
-              <Text style={styles.courseSelectorArrow}>▼</Text>
-            </TouchableOpacity>
-  {showCourseDropdown && (
-              <View style={styles.courseDropdown}>
-                {COURSES.map((c) => (
-                  <TouchableOpacity
-                    key={c}
-                    style={styles.courseOption}
-                    onPress={() => {
-                      setCourse(c);
-                      setShowCourseDropdown(false);
-                    }}
-                  >
-                    <Text style={styles.courseOptionText}>{c}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+        <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
+          <Text style={styles.addButtonText}>Save Item</Text>
+        </TouchableOpacity>
 
-            <TouchableOpacity style={styles.addButton} onPress={addMenuItem}>
-              <Text style={styles.addButtonText}>Add Item</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.sectionHeader}>
-  <Text style={styles.sectionTitle}>Menu Items</Text>
-  <Text style={styles.totalCount}>Total: {menuItems.length}</Text>
-</View>
-
-            <View style={styles.empty}>
-              <Text style={styles.emptyText}>No items yet.</Text>
-            </View>
-          ) : (
-            <FlatList
-              data={menuItems}
-              renderItem={renderMenuItem}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.list}
-            />
-          )}
-        </View>
-      </KeyboardAvoidingView>
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: "#777", marginTop: 8 }]}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.addButtonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen
+          name="AddMenuItem"
+          component={AddMenuItemScreen}
+          options={{ title: "Add Menu Item" }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -181,120 +159,77 @@ const styles = StyleSheet.create({
     backgroundColor: "#f7f7fb",
   },
   container: {
+    flex: 1,
     padding: 16,
-    paddingBottom: 32,
   },
   header: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "700",
-    marginBottom: 12,
     textAlign: "center",
+    color: "#2e86de",
+    marginBottom: 16,
   },
-  form: {
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#e2e2ea",
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    marginBottom: 8,
-  },
-  multiline: {
-    minHeight: 70,
-  },
-  courseSelector: {
-    borderWidth: 1,
-    borderColor: "#e2e2ea",
-    padding: 12,
-    borderRadius: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-  courseSelectorText: {
+  totalCount: {
     fontSize: 16,
-  },
-  courseSelectorArrow: {
-    fontSize: 12,
-    color: "#666",
-  },
-  courseDropdown: {
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: "#e2e2ea",
-    borderRadius: 8,
-    overflow: "hidden",
-    backgroundColor: "#fff",
-  },
-  courseOption: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f3",
-  },
-  courseOptionText: {
-    fontSize: 15,
+    textAlign: "center",
+    color: "#555",
+    marginBottom: 10,
   },
   addButton: {
-    marginTop: 12,
     backgroundColor: "#2e86de",
-    paddingVertical: 12,
+    padding: 12,
     borderRadius: 8,
     alignItems: "center",
+    marginTop: 12,
   },
   addButtonText: {
     color: "#fff",
     fontWeight: "700",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#ececf2",
-    marginVertical: 16,
-  },
-  sectionHeader: {
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: 8,
-totalCount: {
-  fontSize: 16,
-  color: "#555",
-  fontWeight: "600",
-},
-
-  list: {
-    paddingBottom: 8,
+    fontSize: 16,
   },
   card: {
     backgroundColor: "#fff",
     padding: 12,
     borderRadius: 10,
-    marginBottom: 12,
+    marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#f0f0f3",
-  },
-  cardHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
+    borderColor: "#eee",
   },
   cardTitle: {
+    fontSize: 18,
     fontWeight: "700",
-    fontSize: 16,
   },
   cardCourse: {
-    fontSize: 13,
-    color: "#666",
+    fontSize: 14,
+    color: "#777",
+    marginBottom: 4,
+  },
+  cardDesc: {
+    fontSize: 14,
+    color: "#555",
+  },
+  cardPrice: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#2e86de",
+    marginTop: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 8,
+    backgroundColor: "#fff",
+  },
+  multiline: {
+    height: 70,
+    textAlignVertical: "top",
+  },
+  emptyText: {
+    textAlign: "center",
+    color: "#888",
+    marginBottom: 16,
   },
 });
- 
 
