@@ -1,70 +1,11 @@
-Menu App – React Native
+# Sample Snack app
 
-A simple React Native menu management app that allows you to add dishes with their name, description, price, and course (e.g., Starters, Mains, Dessert). Built for learning and prototyping purposes.
+Open the `App.js` file to start writing some code. You can preview the changes directly on your phone or tablet by scanning the **QR code** or use the iOS or Android emulators. When you're done, click **Save** and share the link!
 
-🚀 Features
+When you're ready to see everything that Expo provides (or if you want to use your own editor) you can **Download** your project and use it with [expo cli](https://docs.expo.dev/get-started/installation/#expo-cli)).
 
-Add new menu items with:
+All projects created in Snack are publicly available, so you can easily share the link to this project via link, or embed it on a web page with the `<>` button.
 
-Name
+If you're having problems, you can tweet to us [@expo](https://twitter.com/expo) or ask in our [forums](https://forums.expo.dev/c/expo-dev-tools/61) or [Discord](https://chat.expo.dev/).
 
-Description
-
-Price
-
-Course type
-
-Form validation
-
-Dynamic course selector
-
-Animated list updates (LayoutAnimation)
-
-Mobile-optimized UI with FlatList rendering
-
-Reset form functionality 📦 Tech Stack
-
-React Native
-
-TypeScript
-
-React Hooks
-
-StyleSheet (Inline styles) Getting Started Prerequisites
-
-Node.js (v16+)
-
-npm or yarn
-
-Expo CLI (recommended for easy testing) Install it globally:
-
-npm install -g expo-cli
-
-🔧 Installation
-
-Clone the repository git clone https://github.com/Neo3004/menu.git cd 
-https://m.youtube.com/shorts/ZvuyTvkNypw
-menu-app Install dependencies
-npm install
-
-or
-yarn Run the app
-
-expo start Scan the QR code in your terminal using the Expo Go app on your phone or open it in a simulator.
-
-📁 Project Structure
-
-/menu-app │ ├── App.tsx # Main application logic ├── /assets # Assets like images, icons ├── /components # Reusable UI components ├── styles.ts # Centralized StyleSheet (or inside App.tsx) ├── README.md # You're here! └── package.json ✨ Future Improvements Edit or delete menu items
-
-Persistent storage (AsyncStorage or SQLite)
-
-Better UI with dropdown modals
-
-Filtering or sorting by course
-
-Unit tests (Jest + Testing Library)
-
-🙋‍♂️ Author Your Name GitHub: @Neo3004
-
-📄 License This project is open source and available under the MIT License.
-
+Snack is Open Source. You can find the code on the [GitHub repo](https://github.com/expo/snack).
