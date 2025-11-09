@@ -74,14 +74,15 @@ add them manually in the "Dependencies" tab.)*
 1.  Create a new React Native project.\
 
 2.  Copy the `App.js` code into your main file.\
-
-3.  Install the dependencies listed above using:
+    
+https://m.youtube.com/shorts/P7ZzooQ8Qh4
+4.  Install the dependencies listed above using:
 
     ``` bash
     npm install @react-navigation/native @react-navigation/stack react-native-screens react-native-safe-area-context
     ```
 
-4.  Run the app with:
+5.  Run the app with:
 
     ``` bash
     npx react-native run-android
