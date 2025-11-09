@@ -43,7 +43,6 @@ npm install -g expo-cli
 🔧 Installation
 
 Clone the repository git clone https://github.com/Neo3004/menu.git cd menu-app Install dependencies
-
 npm install
 
 or
